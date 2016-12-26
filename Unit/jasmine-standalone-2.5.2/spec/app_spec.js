@@ -1,7 +1,7 @@
  /* Tests */
       describe('http tests', function () {
         
-        beforeEach(module('moviesApp'));
+        beforeEach(module('SampleApp'));
 
         var $controller;
         var $httpBackend;
@@ -22,7 +22,7 @@
           }));
 
           it('should load default movies (with real http request)', function (done) {
-            var moviesController = $controller('MovieController', { $scope: $scope });
+            var sampleController = $controller('SampleController', { $scope: $scope });
 
             setTimeout(function() {
 

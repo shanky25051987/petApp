@@ -1,7 +1,7 @@
-var app = angular.module('moviesApp', []);
+var app = angular.module('SampleApp', []);
 
-      app.controller('MovieController', function movieController($scope, $http) {
-        var getMovieData = function getMovieData() {
+      app.controller('SampleController', function sampleController($scope, $http) {
+        var getSampleData = function getSampleData() {
           $http.get('http://www.omdbapi.com/', {
               params: { s: $scope.keyword }
             }).success(function(data, status, headers, config) {              
@@ -14,6 +14,6 @@ var app = angular.module('moviesApp', []);
         /* On Load */
         $scope.movies = [];
         $scope.keyword = 'terminator';
-        getMovieData();
+        getSampleData();
 
       });
