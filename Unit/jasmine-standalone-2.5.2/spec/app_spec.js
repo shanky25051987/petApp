@@ -1,55 +1,44 @@
-// ---SPECS-------------------------
-describe('petsApp', function () {
-    var scope,
-    controller;
-    beforeEach(function () {
-        module('petsApp');
-    });
- describe('appCntrl', function () {
+describe('mixing real and fake http tests', function() {
 
-        var $httpBackend,
-            expectedUrl = 'https://agl-developer-test.azurewebsites.net/people.json?callback=JSON_CALLBACK&format=jsonp',
-            promise,
-            successCallback,
-            errorCallback,
-            httpController;
+  beforeEach(angular.mock.http.init);
+  afterEach(angular.mock.http.reset);
 
-        beforeEach(inject(function ($rootScope, $controller, _$httpBackend_) {
-            $httpBackend = _$httpBackend_;
-            scope = $rootScope.$new();
-            successCallback = jasmine.createSpy();
-            errorCallback = jasmine.createSpy();
-            httpController = $controller('appCntrl', {
-                '$scope': scope
-            });
-        }));
+  beforeEach(inject(function(_$controller_, _$httpBackend_) {
+    $controller = _$controller_;
+    $scope = {};
+    $httpBackend = _$httpBackend_;
+  }));
 
-        afterEach(function() {
-            $httpBackend.verifyNoOutstandingExpectation();
-            $httpBackend.verifyNoOutstandingRequest();
-        });
+  it('should load default movies (with real http request)', function (done) {
 
-        it('returns http requests successfully and resolves the promise', function () {
-            
-            expect(httpController).toBeDefined();
-            $httpBackend.expectGET(expectedUrl).respond(200, data);
-            promise.then(successCallback, errorCallback);
+  	// make a real http call
+    $httpBackend.whenGET('http://www.omdbapi.com/?s=terminator').passThrough();
 
-            $httpBackend.flush();
+    var moviesController = $controller('MovieController', { $scope: $scope });
 
-            expect(successCallback).toHaveBeenCalledWith(angular.fromJson(data));
-            expect(errorCallback).not.toHaveBeenCalled();
-        });
+    setTimeout(function() {
+      expect($scope.movies).not.toEqual([]);
+      done();
+    }, 1000);
 
-        it('returns http requests with an error and rejects the promise', function () {
-            $httpBackend.expectGET(expectedUrl).respond(500, 'Oh no!!');
-            promise.then(successCallback, errorCallback);
+  });
 
-            $httpBackend.flush();
-
-            expect(successCallback).not.toHaveBeenCalled();
-            expect(errorCallback).toHaveBeenCalled();
-        });
-    });
+  it('should search for movie (with fake http request)', function (done) {
     
+    // use fakes only
+    $httpBackend.whenGET('http://www.omdbapi.com/?s=terminator').respond({ Search: [{ title: 'Terminator' }] });
+    $httpBackend.whenGET('http://www.omdbapi.com/?s=star+wars').respond({ Search: [{ title: 'Return of the Jedi'}] });
+
+    var moviesController = $controller('MovieController', { $scope: $scope });
+    
+    $scope.keyword = 'star wars';
+    $scope.search();
+    
+    setTimeout(function() {
+      expect($scope.movies).toEqual([{ title: 'Return of the Jedi'}]);
+      done();
+    }, 1000);
+    
+  });
+
 });
