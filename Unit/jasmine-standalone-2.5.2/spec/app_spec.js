@@ -1,44 +1,40 @@
-describe('mixing real and fake http tests', function() {
+ /* Tests */
+      describe('http tests', function () {
+        
+        beforeEach(module('moviesApp'));
 
-  beforeEach(angular.mock.http.init);
-  afterEach(angular.mock.http.reset);
+        var $controller;
+        var $httpBackend;
+        var $scope;
 
-  beforeEach(inject(function(_$controller_, _$httpBackend_) {
-    $controller = _$controller_;
-    $scope = {};
-    $httpBackend = _$httpBackend_;
-  }));
+        describe('real http tests', function() {
 
-  it('should load default movies (with real http request)', function (done) {
+          beforeEach(angular.mock.http.init);
+          afterEach(angular.mock.http.reset);
 
-  	// make a real http call
-    $httpBackend.whenGET('http://www.omdbapi.com/?s=terminator').passThrough();
+          beforeEach(inject(function(_$controller_, _$httpBackend_) {
+            $controller = _$controller_;
+            $scope = {};
+            $httpBackend = _$httpBackend_;
 
-    var moviesController = $controller('MovieController', { $scope: $scope });
+            // Note that this HTTP backend is ngMockE2E's, and will make a real HTTP request
+            $httpBackend.whenGET('http://www.omdbapi.com/?s=terminator').passThrough();
+          }));
 
-    setTimeout(function() {
-      expect($scope.movies).not.toEqual([]);
-      done();
-    }, 1000);
+          it('should load default movies (with real http request)', function (done) {
+            var moviesController = $controller('MovieController', { $scope: $scope });
 
-  });
+            setTimeout(function() {
 
-  it('should search for movie (with fake http request)', function (done) {
-    
-    // use fakes only
-    $httpBackend.whenGET('http://www.omdbapi.com/?s=terminator').respond({ Search: [{ title: 'Terminator' }] });
-    $httpBackend.whenGET('http://www.omdbapi.com/?s=star+wars').respond({ Search: [{ title: 'Return of the Jedi'}] });
+              console.log('Look, real data:');
+              console.log($scope.movies);
 
-    var moviesController = $controller('MovieController', { $scope: $scope });
-    
-    $scope.keyword = 'star wars';
-    $scope.search();
-    
-    setTimeout(function() {
-      expect($scope.movies).toEqual([{ title: 'Return of the Jedi'}]);
-      done();
-    }, 1000);
-    
-  });
+              expect($scope.movies).not.toEqual([]);
+              done();
+            }, 1000);
 
-});
+          });
+
+        });
+
+      });  
