@@ -15,15 +15,16 @@
 
       <div ng-controller="appCntrl">
          Male
-          <div ng-repeat="male in males | orderBy:male">
+          <div ng-repeat="male in males | orderBy:'name'">
               <ul>
-                <li>{{male}}</li>
+                <li ng-repeat="pet in male | animalType">{{pet}}</li>
               </ul>
          </div>
          Female
-          <div ng-repeat="female in females | orderBy:female">
+          <div ng-repeat="female in females | orderBy:'name'">
               <ul>
-                <li>{{female}}</li>
+                <li ng-repeat="pet in female | animalType">{{pet}}</li>
+
               </ul>
          </div>
       </div>
